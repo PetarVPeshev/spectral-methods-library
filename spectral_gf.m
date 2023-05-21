@@ -1,11 +1,11 @@
-function sgf = spectral_gf(relat_permit, k0, kx0, ky0, v_tm, v_te, ...
+function sgf = spectral_gf(relat_permit, k, kx, ky, v_tm, v_te, ...
     i_tm, i_te, field, current)
 %SPECTRAL_GF Summary of this function goes here
 %   Detailed explanation goes here
     wave_impedance = 376.730313668 / sqrt(relat_permit);
-    k = k0 * sqrt(relat_permit);
-    kx = kx0 * sqrt(relat_permit);
-    ky = ky0 * sqrt(relat_permit);
+%     k = k0 * sqrt(relat_permit);
+%     kx = kx0 * sqrt(relat_permit);
+%     ky = ky0 * sqrt(relat_permit);
     krho = sqrt(kx .^ 2 + ky .^ 2);
 
     sgf = NaN( [size(kx, 1, 2), 3, 2] );
