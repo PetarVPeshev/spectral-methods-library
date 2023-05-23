@@ -40,6 +40,22 @@ function FT = ft_current(k, varargin)
         else
             error('Not implemented');
         end
+    elseif strcmp(antenna, 'uniform')
+        k_comp = varargin{1};
+        width = varargin{2};
+        length = varargin{3};
+
+        J = length * sinc(k_comp(:, :, 1) * length / (2 * pi)) ...
+            .* sinc(k_comp(:, :, 2) * width / (2 * pi));
+
+        FT = zeros( [size(k_comp, 1, 2), 2] );
+        if strcmp(orientation, 'x')
+            FT(:, :, 1) = J;
+        elseif strcmp(orientation, 'y')
+            FT(:, :, 2) = J;
+        else
+            error('Error. Invalid antenna orientation.');
+        end
     end
 end
 
