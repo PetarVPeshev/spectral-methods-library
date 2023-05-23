@@ -47,11 +47,17 @@ function varargout = residue_stratified(k0, krho_te, krho_tm, z, varargin)
         Z_te = Zair_te .* Zin_te ./ D_te_prime;
         Z_tm = Zair_tm .* Zin_tm ./ D_tm_prime;
         
-        % Dielectric medium voltage and current
+        % Dielectric medium voltage and currents
         v_te = Z_te .* sin(dielectric_kz_te .* z) / sin(dielectric_kz_te * slab_length);
         i_te = 1j * (Z_te / Zs) * cos(dielectric_kz_te .* z) / sin(dielectric_kz_te * slab_length);
         v_tm = Z_tm .* sin(dielectric_kz_tm .* z) / sin(dielectric_kz_tm * slab_length);
         i_tm = 1j * (Z_tm / Zs) * cos(dielectric_kz_tm .* z) / sin(dielectric_kz_tm * slab_length);
+
+        % Free-space voltage and currents
+        v_te(z > slab_length) = Z_te .* exp(1j * air_kz_te * (slab_length - z(z > slab_length)));
+        i_te(z > slab_length) = (Z_te / Zair_te) .* exp(1j * air_kz_te * (slab_length - z(z > slab_length)));
+        v_tm(z > slab_length) = Z_tm .* exp(1j * air_kz_tm * (slab_length - z(z > slab_length)));
+        i_tm(z > slab_length) = (Z_tm / Zair_tm) .* exp(1j * air_kz_tm * (slab_length - z(z > slab_length)));
 
         varargout{1} = v_te;
         varargout{2} = i_te;
