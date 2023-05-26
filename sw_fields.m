@@ -1,4 +1,4 @@
-function E = sw_fields(k0, krho, v, i, J, er, cyl_grid, component)
+function E = sw_fields(k0, krho, v, current, J, er, cyl_grid, component)
 %SW_FIELDS Summary of this function goes here
 %   Detailed explanation goes here
     wave_impedance = 376.730313668;
@@ -15,7 +15,7 @@ function E = sw_fields(k0, krho, v, i, J, er, cyl_grid, component)
         const = const .* cos(phi) .* exp(- 1j * krho * rho) ./ sqrt(rho);
 
         Erho = v .* J(:, :, 1) .* const;
-        Ez = - dielectric_impedance * (krho / k) * i .* J(:, :, 1) .* const;
+        Ez = - dielectric_impedance * (krho / k) * current .* J(:, :, 1) .* const;
 
         E = zeros( [size(J, 1, 2), 3] );
         E(:, :, 1) = Erho;
