@@ -93,9 +93,12 @@ function [krho_te, krho_tm] = find_krho(k0, krho, varargin)
         delta_k = k0 / 500;
             
         % Newton's method for TE krho
-        krho_te_prev = 0;
+%         variance = 1;
+%         variance_idx = 0;
+%         krho_te_prev = 0;
         idx = 0;
-        while abs(krho_te - krho_te_prev) > 0.00001 && idx < 500
+%         while abs(krho_te - krho_te_prev) > 0.00001
+        while abs(krho_te - krho_te_prev) > 0.00001
             [D_te, ~] = dispersion_eqn(k0, krho_te, ...
                 'Superstrate', air_length, slab_length, slab_er);
         
@@ -105,15 +108,30 @@ function [krho_te, krho_tm] = find_krho(k0, krho, varargin)
                 'Superstrate', air_length, slab_length, slab_er);
         
             D_te_prime = (D_te_1 - D_te_2) / delta_k;
+%             krho_te_prev_2 = krho_te_prev;
+            krho_te_mid = krho_te - D_te / D_te_prime;
+            if krho_te_prev == krho_te_mid
+                krho_te = krho_te_mid;
+                break;
+            end
             krho_te_prev = krho_te;
-            krho_te = krho_te_prev - D_te / D_te_prime;
-            idx = idx + 1;
+            krho_te = krho_te_mid;
+%             krho_te = 
+
+%             variance = abs(krho_te - krho_te_prev);
+%             if prev_variance == variance
+%                 variance_idx = variance_idx + 1;
+%             end
+%             prev_variance = variance;
+
+%             if krho_te_prev_2 == krho_te
+%                 break;
+%             end
         end
             
         % Newton's method for TM krho
         krho_tm_prev = 0;
-        idx = 0;
-        while abs(krho_tm - krho_tm_prev) > 0.00001 && idx < 500
+        while abs(krho_tm - krho_tm_prev) > 0.00001
             [~, D_tm] = dispersion_eqn(k0, krho_tm, ...
                 'Superstrate', air_length, slab_length, slab_er);
         
@@ -123,9 +141,19 @@ function [krho_te, krho_tm] = find_krho(k0, krho, varargin)
                 'Superstrate', air_length, slab_length, slab_er);
         
             D_tm_prime = (D_tm_1 - D_tm_2) / delta_k;
+%             krho_tm_prev_2 = krho_tm_prev;
+            krho_tm_mid = krho_tm - D_tm / D_tm_prime;
+            if krho_tm_prev == krho_tm_mid
+                krho_tm = krho_tm_mid;
+                break;
+            end
             krho_tm_prev = krho_tm;
-            krho_tm = krho_tm_prev - D_tm / D_tm_prime;
-            idx = idx + 1;
+            krho_tm = krho_tm_mid;
+%             krho_tm = 
+
+%             if krho_tm_prev_2 == krho_tm
+%                 break;
+%             end
         end
     end
 end
