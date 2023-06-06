@@ -127,5 +127,61 @@ function [krho_te, krho_tm] = find_krho(k0, krho, varargin)
             krho_tm = krho_tm_prev - D_tm / D_tm_prime;
             idx = idx + 1;
         end
+    elseif strcmp(varargin{1}, 'SemiInfiniteSuperstrate')
+        air_length = varargin{2};
+        slab_er = varargin{3};
+        
+        wavelength = 2 * pi / k0;
+        h_bar = air_length / wavelength;
+    
+        % Approximated kz
+        air_kz_te = k0 * (2 * pi * h_bar * sqrt(slab_er) + 1j) ...
+            / ((pi * sqrt(slab_er) * (2 * h_bar) ^ 2) ...
+            * (1 + 1 / ( slab_er * (2 * pi * h_bar) ^ 2)));
+        air_kz_tm = (k0 / (4 * h_bar)) ...
+            * (1 + sqrt(1 + 8j * h_bar / (pi * sqrt(slab_er))));
+    
+        % Approximated krho in air
+        krho_te = sqrt(k0 ^ 2 - air_kz_te ^ 2);
+        krho_tm = sqrt(k0 ^ 2 - air_kz_tm ^ 2);
+            
+        % Step k
+        delta_k = k0 / 500;
+            
+        % Newton's method for TE krho
+        krho_te_prev = 0;
+        idx = 0;
+        while abs(krho_te - krho_te_prev) > 0.00001 && idx < 500
+            [D_te, ~] = dispersion_eqn(k0, krho_te, ...
+                'SemiInfiniteSuperstrate', air_length, slab_er);
+        
+            [D_te_1, ~] = dispersion_eqn(k0, krho_te + delta_k / 2, ...
+                'SemiInfiniteSuperstrate', air_length, slab_er);
+            [D_te_2, ~] = dispersion_eqn(k0, krho_te - delta_k / 2, ...
+                'SemiInfiniteSuperstrate', air_length, slab_er);
+        
+            D_te_prime = (D_te_1 - D_te_2) / delta_k;
+            krho_te_prev = krho_te;
+            krho_te = krho_te_prev - D_te / D_te_prime;
+            idx = idx + 1;
+        end
+            
+        % Newton's method for TM krho
+        krho_tm_prev = 0;
+        idx = 0;
+        while abs(krho_tm - krho_tm_prev) > 0.00001 && idx < 500
+            [~, D_tm] = dispersion_eqn(k0, krho_tm, ...
+                'SemiInfiniteSuperstrate', air_length, slab_er);
+        
+            [~, D_tm_1] = dispersion_eqn(k0, krho_tm + delta_k / 2, ...
+                'SemiInfiniteSuperstrate', air_length, slab_er);
+            [~, D_tm_2] = dispersion_eqn(k0, krho_tm - delta_k / 2, ...
+                'SemiInfiniteSuperstrate', air_length, slab_er);
+        
+            D_tm_prime = (D_tm_1 - D_tm_2) / delta_k;
+            krho_tm_prev = krho_tm;
+            krho_tm = krho_tm_prev - D_tm / D_tm_prime;
+            idx = idx + 1;
+        end
     end
 end

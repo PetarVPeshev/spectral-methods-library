@@ -57,6 +57,29 @@ function [D_te, D_tm] = dispersion_eqn(k0, krho, varargin)
         % Denominator
         D_te = Zl_te + 1j * Zair_te .* tan(- air_kz * air_length);
         D_tm = Zl_tm + 1j * Zair_tm .* tan(- air_kz * air_length);
+    elseif strcmp(varargin{1}, 'SemiInfiniteSuperstrate')
+        air_length = varargin{2};
+        slab_er = varargin{3};
+        
+        slab_k = k0 * sqrt(slab_er);
+        slab_impedance = wave_impedance / sqrt(slab_er);
+        
+        air_kz = - 1j * sqrt( - k0 ^ 2 + krho .^ 2 );
+        slab_kz = - 1j * sqrt( - slab_k ^ 2 + krho .^ 2 );
+    
+        % Air impedance
+        Zair_te = wave_impedance * k0 ./ air_kz;
+        Zair_tm = wave_impedance * air_kz / k0;
+    
+        % Superstrate impedance
+        Zs_te = slab_impedance * slab_k ./ slab_kz;
+        Zs_tm = slab_impedance * slab_kz / slab_k;
+    
+        % Denominator
+        D_te = Zs_te + 1j * Zair_te .* tan(- air_kz * air_length);
+        D_tm = Zs_tm + 1j * Zair_tm .* tan(- air_kz * air_length);
+    else
+        error('Error. Invalid argument.');
     end
 end
 
