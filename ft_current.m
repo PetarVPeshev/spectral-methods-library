@@ -24,7 +24,13 @@ function FT = ft_current(k, varargin)
             FT = zeros( [size(k_comp, 1, 2), 2] );
             FT(:, :, 1) = F .* T;
         else
-            error('Not implemented');
+            T = sinc( k_comp(:, :, 1) * width / (2 * pi) );
+            F = 2 * keq * ( cos(k_comp(:, :, 2) * length / 2) - ...
+                cos(keq * length / 2) ) ./ ( (keq^2 - ...
+                k_comp(:, :, 2).^2) * sin(keq * length / 2) );
+
+            FT = zeros( [size(k_comp, 1, 2), 2] );
+            FT(:, :, 2) = F .* T;
         end
     elseif strcmp(antenna, 'circular')
         a = varargin{1};
