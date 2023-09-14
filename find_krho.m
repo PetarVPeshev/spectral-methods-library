@@ -26,6 +26,11 @@ function [krho_te, krho_tm] = find_krho(k0, krho, varargin)
             krho_te_prev = k0;
         end
 
+        if length(krho_te) ~= 1
+            krho_te = krho_te(end);
+            warning('Several solutions to dispersion equation are found.');
+        end
+
         while abs(krho_te - krho_te_prev) > 0.00001
             [D_te, ~] = dispersion_eqn(k0, krho_te, ...
                 'GroundSlab', slab_length, dielectric_er);
@@ -47,12 +52,18 @@ function [krho_te, krho_tm] = find_krho(k0, krho, varargin)
         
         % Newton's method for TM krho
         krho_tm_prev = 0;
-        if isempty(krho_te)
+        if isempty(krho_tm)
             krho_tm = k0;
             krho_tm_prev = k0;
         end
+
+        if length(krho_tm) ~= 1
+            krho_tm = krho_tm(end);
+            warning('Several solutions to dispersion equation are found.');
+        end
         
-        while abs(krho_tm - krho_tm_prev) > 0.00001 && ~isempty(krho_tm)
+%         while abs(krho_tm - krho_tm_prev) > 0.00001 && ~isempty(krho_tm)
+        while abs(krho_tm - krho_tm_prev) > 0.00001
             [~, D_tm] = dispersion_eqn(k0, krho_tm, ...
                 'GroundSlab', slab_length, dielectric_er);
         
